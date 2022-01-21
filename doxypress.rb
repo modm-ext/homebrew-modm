@@ -4,10 +4,10 @@ class Doxypress < Formula
     desc 'DoxyPress: C++ documentation generator'
     homepage 'https://www.copperspice.com/documentation-doxypress.html'
 
-    url 'https://download.copperspice.com/doxypress/binary/doxypress-1.4.1-osx10.14-x64.tar.bz2'
+    url 'https://github.com/copperspice/doxypress/releases/download/dp-1.4.2/doxypress-1.4.2-osx10.16-x64.tar.bz2'
 
-    sha256 'd50bf9c65c5dd6c02b58a4fe4ecc6ad570404bb45ab55f4e71ef4d42b7cd7b2f'
-    version '1.4.1'
+    sha256 '13eaec9e313f8212c6c8f8b61fabfc225c960f23fa383807277a93e7eb4cf869'
+    version '1.4.2'
 
     def install
         bin.install "doxypress"
