@@ -1,0 +1,76 @@
+name: Test
+
+on: [pull_request]
+
+jobs:
+  macos_testing:
+    runs-on: macos-12
+
+    steps:
+      # - name: Setup environment - Brew tap
+      #   run: |
+      #     ## Git repo needs to be checked of at ${{ github.ref }}, but brew can't do that :(
+      #     #brew tap modm-ext/modm 
+      # - name: Setup environment - Brew install
+      #   run: |
+      #     export HOMEBREW_NO_INSTALL_CLEANUP=1 # saves time
+      #     brew update
+      #     brew install arm-gcc-xpack@12
+      #     brew install doxypress
+
+      - name: Clone repo
+        uses: actions/checkout@v3
+
+      # Because `brew tap` is not able to use a specified git ref we manually
+      # clone this repo and install the formulae by specfying the filename
+      - name: Brew install
+        run: |
+          export HOMEBREW_NO_INSTALL_CLEANUP=1 # saves time
+          brew install ./Formula/arm-gcc-xpack@12.rb
+          brew install ./Formula/doxypress.rb
+
+      - name: Environment info
+        run: |
+          echo $PATH
+          env
+          locale -a
+
+      - name: Check arm-none-eabi-g++
+        run: |
+          which arm-none-eabi-g++
+          arm-none-eabi-g++ --version
+
+      - name: Check doxypress
+        run: |
+          which doxypress
+          doxypress --version
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Setup environment - Python pip
+        run: |
+          pip3 install --user modm scons
+          echo "/usr/local/bin" >> $GITHUB_PATH
+          echo "/Users/runner/Library/Python/3.11/bin" >> $GITHUB_PATH
+
+      - name: Update lbuild
+        run: |
+          pip3 install --upgrade --user --upgrade-strategy=eager modm
+
+      - name: Clone modm
+        uses: actions/checkout@v3
+        with:
+          repository: 'modm-io/modm'
+          ref: 'develop'
+          submodules: 'recursive'
+          path: 'modm'
+
+      - name: Compile some examples with arm-gcc-xpack toolchain
+        run: |
+          (cd modm/examples && ../tools/scripts/examples_compile.py nucleo_f031k6 nucleo_f103rb nucleo_f303re nucleo_f411re nucleo_f746zg)
+
+      - name: Generate docs for stm32f030f4p6_demo_board/blink with doxypress
+        run: |
+          (cd modm/examples/stm32f030f4p6_demo_board/blink/ && lbuild build -m :docs && cd modm/docs && doxypress doxypress.json)
