@@ -9,3 +9,7 @@
 ## GNU Arm Embedded GCC Toolchain (xPack binary distribution)
 
 `brew install arm-gcc-xpack`
+
+## STMicro fork of OpenOCD
+
+`brew install openocd-stmicro`
