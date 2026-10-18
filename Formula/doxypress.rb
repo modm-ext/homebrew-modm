@@ -25,6 +25,9 @@ class Doxypress < Formula
 
   def install
     (buildpath/"copperspice").install resource("copperspice")
+    # The CMake targets hardcode libz from the SDK CopperSpice was built with
+    inreplace "copperspice/CopperSpice.framework/Resources/CopperSpiceLibraryTargets.cmake",
+              %r{"[^"]*/usr/lib/libz\.tbd"}, '"z"'
 
     # Use the Homebrew LLVM dylibs instead of the bundled static clang libs
     llvm = Formula["llvm@20"]
