@@ -22,15 +22,14 @@ class ArmGccXpackAT15 < Formula
     # next to it. Keep the whole tree private in libexec, so that the bundled
     # Python is not linked into the Homebrew prefix where it breaks other Pythons.
     libexec.install Dir["*"]
-    bin.install_symlink (Dir[libexec/"bin/*"] - [(libexec/"bin/arm-none-eabi-gdb").to_s])
-    # The plain arm-none-eabi-gdb has no Python, but modm tools call it by that name
-    bin.install_symlink libexec/"bin/arm-none-eabi-gdb-py3" => "arm-none-eabi-gdb"
+    bin.install_symlink Dir[libexec/"bin/*"]
+    # arm-gcc-bin used to name the Python GDB arm-none-eabi-gdb-py
     bin.install_symlink libexec/"bin/arm-none-eabi-gdb-py3" => "arm-none-eabi-gdb-py"
   end
 
   test do
     (testpath/"test.c").write "int main(void) { return 0; }"
     system bin/"arm-none-eabi-gcc", "-mcpu=cortex-m4", "--specs=nosys.specs", "test.c", "-o", "test.elf"
-    assert_match "ok", shell_output("#{bin}/arm-none-eabi-gdb -batch -ex 'python import ssl; print(\"ok\")'")
+    assert_match "ok", shell_output("#{bin}/arm-none-eabi-gdb-py3 -batch -ex 'python import ssl; print(\"ok\")'")
   end
 end

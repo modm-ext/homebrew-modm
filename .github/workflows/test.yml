@@ -46,8 +46,8 @@ jobs:
 
       - name: Check arm-none-eabi-gdb with Python
         run: |
-          which arm-none-eabi-gdb
-          arm-none-eabi-gdb -batch -ex 'python import sys, ssl; print(sys.version)'
+          which arm-none-eabi-gdb-py3
+          arm-none-eabi-gdb-py3 -batch -ex 'python import sys, ssl; print(sys.version)'
 
       - name: Check doxypress
         run: |

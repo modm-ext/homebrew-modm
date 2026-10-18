@@ -10,7 +10,7 @@
 
 `brew install arm-gcc-xpack@15`
 
-Includes `arm-none-eabi-gdb` with Python 3 support.
+Includes `arm-none-eabi-gdb-py3` with Python 3 support.
 
 ## STMicro fork of OpenOCD
 
