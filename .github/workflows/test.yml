@@ -4,7 +4,7 @@ on: [pull_request]
 
 jobs:
   macos_testing:
-    runs-on: macos-12
+    runs-on: macos-15
 
     steps:
       # - name: Setup environment - Brew tap
@@ -19,15 +19,17 @@ jobs:
       #     brew install doxypress
 
       - name: Clone repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # Because `brew tap` is not able to use a specified git ref we manually
-      # clone this repo and install the formulae by specfying the filename
+      # Because `brew tap` is not able to use a specified git ref and brew no
+      # longer installs formulae from files, we link the checkout as the tap
       - name: Brew install
         run: |
           export HOMEBREW_NO_INSTALL_CLEANUP=1 # saves time
-          brew install ./Formula/arm-gcc-xpack@12.rb
-          brew install ./Formula/doxypress.rb
+          mkdir -p $(brew --repository)/Library/Taps/modm-ext
+          ln -s $GITHUB_WORKSPACE $(brew --repository)/Library/Taps/modm-ext/homebrew-modm
+          brew install modm-ext/modm/arm-gcc-xpack@12
+          brew install --build-from-source modm-ext/modm/doxypress
 
       - name: Environment info
         run: |
@@ -45,7 +47,7 @@ jobs:
           which doxypress
           doxypress --version
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -60,7 +62,7 @@ jobs:
           pip3 install --upgrade --user --upgrade-strategy=eager modm
 
       - name: Clone modm
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: 'modm-io/modm'
           ref: 'develop'
