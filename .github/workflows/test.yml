@@ -15,7 +15,6 @@ jobs:
       #   run: |
       #     export HOMEBREW_NO_INSTALL_CLEANUP=1 # saves time
       #     brew update
-      #     brew install arm-gcc-xpack@12
       #     brew install doxypress
 
       - name: Clone repo
@@ -28,7 +27,6 @@ jobs:
           export HOMEBREW_NO_INSTALL_CLEANUP=1 # saves time
           mkdir -p $(brew --repository)/Library/Taps/modm-ext
           ln -s $GITHUB_WORKSPACE $(brew --repository)/Library/Taps/modm-ext/homebrew-modm
-          brew install modm-ext/modm/arm-gcc-xpack@12
           brew install --build-from-source modm-ext/modm/doxypress
 
       - name: Environment info
@@ -36,11 +34,6 @@ jobs:
           echo $PATH
           env
           locale -a
-
-      - name: Check arm-none-eabi-g++
-        run: |
-          which arm-none-eabi-g++
-          arm-none-eabi-g++ --version
 
       - name: Check doxypress
         run: |
@@ -68,10 +61,6 @@ jobs:
           ref: 'develop'
           submodules: 'recursive'
           path: 'modm'
-
-      - name: Compile some examples with arm-gcc-xpack toolchain
-        run: |
-          (cd modm/examples && ../tools/scripts/examples_compile.py . --target '^stm32f(031k6|103rb|303re|411re|746zg)')
 
       - name: Generate docs for gpio/blinky with doxypress
         run: |
