@@ -71,8 +71,8 @@ jobs:
 
       - name: Compile some examples with arm-gcc-xpack toolchain
         run: |
-          (cd modm/examples && ../tools/scripts/examples_compile.py nucleo_f031k6 nucleo_f103rb nucleo_f303re nucleo_f411re nucleo_f746zg)
+          (cd modm/examples && ../tools/scripts/examples_compile.py . --target '^stm32f(031k6|103rb|303re|411re|746zg)')
 
-      - name: Generate docs for stm32f030f4p6_demo_board/blink with doxypress
+      - name: Generate docs for gpio/blinky with doxypress
         run: |
-          (cd modm/examples/stm32f030f4p6_demo_board/blink/ && lbuild build -m :docs && cd modm/docs && doxypress doxypress.json)
+          (cd modm/examples/gpio/blinky/ && lbuild build -m :docs && cd modm/docs && doxypress doxypress.json)
