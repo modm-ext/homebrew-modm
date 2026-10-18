@@ -60,8 +60,7 @@ jobs:
 
       - name: Setup environment - Python pip
         run: |
-          pip3 install --user modm scons
-          echo "/usr/local/bin" >> $GITHUB_PATH
+          pip3 install --user modm scons protobuf
           echo "/Users/runner/Library/Python/3.11/bin" >> $GITHUB_PATH
 
       - name: Update lbuild
