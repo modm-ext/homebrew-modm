@@ -3,6 +3,39 @@ name: Test
 on: [pull_request]
 
 jobs:
+  audit:
+    runs-on: macos-15
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Link checkout as tap
+        run: |
+          mkdir -p "$(brew --repository)/Library/Taps/modm-ext"
+          ln -s "$GITHUB_WORKSPACE" "$(brew --repository)/Library/Taps/modm-ext/homebrew-modm"
+          brew trust --tap modm-ext/modm
+
+      - name: Brew style
+        run: brew style modm-ext/modm
+
+      - name: Brew audit
+        if: ${{ !cancelled() }}
+        run: brew audit --strict --online --tap modm-ext/modm
+
+      # Only the changed formulae, fetching all toolchains would take ages
+      - name: Verify checksums of changed formulae
+        if: ${{ !cancelled() }}
+        run: |
+          git diff --name-only --diff-filter=AM "origin/${{ github.base_ref }}..." -- Formula | while read -r file; do
+            formula="modm-ext/modm/$(basename "$file" .rb)"
+            brew fetch --force --arch=arm "$formula"
+            grep -q "depends_on arch: :arm64" "$file" || brew fetch --force --arch=intel "$formula"
+            brew cleanup --prune=all "$formula"
+          done
+
   macos_testing:
     runs-on: macos-15
 
@@ -26,16 +59,18 @@ jobs:
       - name: Brew install
         run: |
           export HOMEBREW_NO_INSTALL_CLEANUP=1 # saves time
-          mkdir -p $(brew --repository)/Library/Taps/modm-ext
-          ln -s $GITHUB_WORKSPACE $(brew --repository)/Library/Taps/modm-ext/homebrew-modm
+          mkdir -p "$(brew --repository)/Library/Taps/modm-ext"
+          ln -s "$GITHUB_WORKSPACE" "$(brew --repository)/Library/Taps/modm-ext/homebrew-modm"
+          brew trust --tap modm-ext/modm
           brew install protobuf # protoc for the nanopb examples
           brew install modm-ext/modm/arm-gcc-xpack@15
-          echo "$(brew --prefix modm-ext/modm/arm-gcc-xpack@15)/bin" >> $GITHUB_PATH
+          echo "$(brew --prefix modm-ext/modm/arm-gcc-xpack@15)/bin" >> "$GITHUB_PATH"
           brew install --build-from-source modm-ext/modm/doxypress
+          brew install modm-ext/modm/arm-gcc-bin@15
 
       - name: Environment info
         run: |
-          echo $PATH
+          echo "$PATH"
           env
           locale -a
 
@@ -43,6 +78,10 @@ jobs:
         run: |
           which arm-none-eabi-g++
           arm-none-eabi-g++ --version
+
+      - name: Check arm-gcc-bin@15
+        run: |
+          brew test modm-ext/modm/arm-gcc-bin@15
 
       - name: Check arm-none-eabi-gdb with Python
         run: |
@@ -61,7 +100,7 @@ jobs:
       - name: Setup environment - Python pip
         run: |
           pip3 install --user modm scons protobuf
-          echo "/Users/runner/Library/Python/3.11/bin" >> $GITHUB_PATH
+          echo "/Users/runner/Library/Python/3.11/bin" >> "$GITHUB_PATH"
 
       - name: Update lbuild
         run: |
