@@ -1,5 +1,5 @@
 class Doxypress < Formula
-  desc "DoxyPress: C++ documentation generator (with modm performance patches)"
+  desc "C++ documentation generator (with modm performance patches)"
   homepage "https://www.copperspice.com/documentation-doxypress.html"
   # dp-2.1.0 plus the perf/modm branch
   url "https://github.com/salkinium/doxypress/archive/5d6050520e9f4ff547de0e140d51d94a58948c16.tar.gz"
